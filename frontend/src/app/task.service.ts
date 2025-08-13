@@ -12,19 +12,22 @@ export interface Task {
 @Injectable()
 export class TaskService {
   // BUG: wrong port, should be 3001
-  private api = 'http://localhost:3000/tasks';
+  private api = 'http://localhost:3001/tasks';
 
   constructor(private http: HttpClient) {}
 
   // BUG: getTasks uses wrong endpoint ('/task' instead of '/tasks')
   getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.api.replace('tasks', 'task'));
+    return this.http.get<Task[]>(this.api);
   }
 
   // BUG: addTask does not send priority
-  addTask(title: string): Observable<Task> {
-    return this.http.post<Task>(this.api, { title }); // missing priority
+  addTask(title: Partial<Task>): Observable<Task> {
+    return this.http.post<Task>(this.api, title); // missing priority
   }
 
   // MISSING: updateTask for marking as completed
+  completeTask(id: number): Observable<Task> {
+    return this.http.patch<Task>(`${this.api}/${id}`, {completed: true});
+  }
 }
